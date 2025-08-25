@@ -25,6 +25,13 @@ void outputList(vector<Punish>& punish){	//输出惩罚列表
 	}
 }
 
+void sout_slower(string s,int speed,int addedWait){
+	for(int i=0;i<s.length();i++){
+		cout<<s[i];
+		Sleep(speed+addedWait*i);
+	}
+}
+
 void Punished(int num,vector<Punish>& punish){
 	int people,array[num+1]={0},dice_roll;
 	cout<<"有多少人要受惩罚：";
@@ -38,15 +45,23 @@ void Punished(int num,vector<Punish>& punish){
             dice_roll=dist(engine);
         }while(array[dice_roll]);
         array[dice_roll]=1;
-        cout<<"第"<<i+1<<"号人的惩罚是："<<punish[dice_roll-1].content<<endl;
+        sout_slower("第",50,5);
+        cout<<i+1;
+        sout_slower("号人的惩罚是：",50,50);
+        lt.Sout(punish[dice_roll-1].content,5);
+        cout<<endl;
     }
     if(people>num) {
         for(int i=num;i<people;++i) {
             dice_roll=dist(engine);
-            cout<<"第"<<i+1<<"号人的惩罚是："<<punish[dice_roll-1].content<<endl;
+            sout_slower("第",50,5);
+        	cout<<i+1;
+        	sout_slower("号人的惩罚是：",50,50);
+        	lt.Sout(punish[dice_roll-1].content,5);
+        	cout<<endl;
         }
     }
-}
+} 
 
 int main(){
 	jindutiao.Jindutiao(70,200,0,0,' ',' ',"加载","low"); 
@@ -133,15 +148,15 @@ int main(){
 				}
 				Punished(cf4,vecPunishList3);
 			}else{
-				cout<<"你没有输入惩罚"<<endl;
+				cout<<"你没有输入惩罚。"<<endl;
 			}
 			break;
 		}
 		default:{
-			cout<<"你是熊孩子吗？"<<endl;
+			cout<<"你是熊孩子吗？在这乱点乱按！"<<endl;
 			break;
 		}
 	} 
-	_getch();
+	lt.DIYpause("请按下任意键，结束这个可恶的程序……");
 	return 0;
 }
