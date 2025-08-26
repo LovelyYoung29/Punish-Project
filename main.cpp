@@ -66,9 +66,8 @@ void Punished(int num,vector<Punish>& punish){
     if(people>num) {
         for(int i=num;i<people;++i) {
             dice_roll=dist(engine);
-            sout_slower("第",50,5);
-        	cout<<i+1;
-        	sout_slower("号人的惩罚是：",50,50);
+            sout_slower(name[i],50,5);
+        	sout_slower("的惩罚是：",50,60);
         	lt.Sout(punish[dice_roll-1].content,5);
         	cout<<endl;
         }
