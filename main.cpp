@@ -7,14 +7,14 @@ struct Punish{	//惩罚结构体
 }; 
 vector<Punish> vecPunishList={	//惩罚列表 
 	{"黑板清洁工：擦一节课的黑板",1},
-	{"小小调试员：将一串有Bug的代码修复",2},
-	{"知识回顾者：在下课前一分钟将课上讲的知识概括出来",3},
+	{"失败发布会：用1分钟时间，面向全班，煞有介事地推介一款根本不存在（或极其愚蠢）的“数字产品”",2},
+	{"代码朗读机：用最饱满的感情、最戏剧化的语调将老师的提供一段枯燥无比、满是嵌套循环和复杂条件的代码大声朗读出来",3},
 	{"我是小模特：用大头照作为课间时大屏幕上的背景",4},
-	{"变量名风暴：根据老师提供的一个模糊的功能描述，写出3个不同风格但语义清晰的变量名",5},
+	{"B u g 之舞：到教室前方，用身体动作模拟一个经典的软件B u g ",5},
 	{"我是小演员：模仿一个鬼畜视频10秒",6},
 	{"我是歌唱家：唱一首歌曲，要大声响亮，不少于30秒",7},
-	{"问题总动员：课上，由老师在合适时机问迟到者一个关于课上内容的问题",8},
-	{"时间赔偿者：迟到几分钟，课间刷几分钟编程题",9},
+	{"旁白解说员：为一段非常无聊的代码运行过程配旁白解说，必须使用体育赛事解说员般的激情",8},
+	{"反向推销者：当一个“反向推销者”，用1分钟时间，极力说服大家放弃使用本节课要学的编程语言或工具，并言之凿凿地罗列它的“缺点”（即使是这些缺点是编的）",9},
 	{"小小说书人：用一分钟时间向大家分享一个关于守时重要性的小故事或名言警句",10}
 };
 void outputList(vector<Punish>& punish){	//输出惩罚列表 
@@ -34,8 +34,21 @@ void sout_slower(string s,int speed,int addedWait){
 
 void Punished(int num,vector<Punish>& punish){
 	int people,array[num+1]={0},dice_roll;
+	system("cls"); 
 	cout<<"有多少人要受惩罚：";
 	cin>>people;
+	vector<string> name(people);
+	if(people>0){
+		int i=1;
+		for(auto &n:name){
+			cout<<"请输入第"<<i<<"个人的人名：";
+			cin>>n;
+			i++;
+		}
+	}else{
+		cout<<"你输入的人数错误！"<<endl; 
+		return;
+	}
 	mt19937 engine;
 	uniform_int_distribution<int> dist(1, num);
 	random_device rd;
@@ -45,9 +58,8 @@ void Punished(int num,vector<Punish>& punish){
             dice_roll=dist(engine);
         }while(array[dice_roll]);
         array[dice_roll]=1;
-        sout_slower("第",50,5);
-        cout<<i+1;
-        sout_slower("号人的惩罚是：",50,50);
+        sout_slower(name[i],50,5);
+        sout_slower("的惩罚是：",50,60);
         lt.Sout(punish[dice_roll-1].content,5);
         cout<<endl;
     }
