@@ -35,6 +35,7 @@ void sout_slower(string s,int speed,int addedWait){
 void Punished(int num,vector<Punish>& punish){
 	int people,array[num+1]={0},dice_roll;
 	system("cls"); 
+	system("color 74");
 	cout<<"有多少人要受惩罚：";
 	cin>>people;
 	vector<string> name(people);
@@ -76,6 +77,8 @@ void Punished(int num,vector<Punish>& punish){
 
 int main(){
 	jindutiao.Jindutiao(70,200,0,0,' ',' ',"加载","low"); 
+	system("title Punish-Project 1.4.2");
+	system("color 09");
 	cout<<"******************************"<<endl;
 	cout<<"*         惩罚小程序         *"<<endl;
 	cout<<"*     让迟到的同学爽翻天     *"<<endl;
@@ -83,6 +86,7 @@ int main(){
 	cout<<"\t\tMade by LovelyYoung"<<endl; 
 	lt.DIYpause("请按下任意键，开启爽翻之旅……");
 	system("cls"); 
+	system("color 07");
 	cout<<"请选择（输入对应的数字）："<<endl;
 	cout<<"1.使用内设的惩罚（10个）" <<endl;
 	outputList(vecPunishList);
