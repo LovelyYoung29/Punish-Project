@@ -93,7 +93,7 @@ int main(){
 	cin>>in;
 	switch(in){
 		case 1:{
-			Punished(10,vecPunishList);
+			Punished(vecPunishList.size(),vecPunishList);
 			break;
 		}
 		case 2:{
@@ -110,7 +110,7 @@ int main(){
 		            vecPunishList.push_back(p);
 				}
 			}
-			Punished(10+cf,vecPunishList);
+			Punished(vecPunishList.size(),vecPunishList);
 			break;
 		}
 		case 3:{
@@ -140,7 +140,7 @@ int main(){
 		        }
 			}
 			if(cf1>0&&cf3>0){
-				Punished(cf1+cf3,vecPunishList2);
+				Punished(vecPunishList2.size(),vecPunishList2);
 			}else{
 				cout<<"没有选择任何惩罚！"<<endl;
 			} 
@@ -157,7 +157,7 @@ int main(){
 					cin>>vecPunishList3[i].content;
 					vecPunishList3[i].index=i+1;
 				}
-				Punished(cf4,vecPunishList3);
+				Punished(vecPunishList3.size(),vecPunishList3);
 			}else{
 				cout<<"你没有输入惩罚。"<<endl;
 			}
