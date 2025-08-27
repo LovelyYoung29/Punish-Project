@@ -77,8 +77,8 @@ void Punished(int num,vector<Punish>& punish){
 
 int main(){
 	jindutiao.Jindutiao(70,200,0,0,' ',' ',"加载","low"); 
-	system("title Punish-Project 1.4.2");
-	system("color 09");
+	system("title Punish-Project 1.4.3");
+	system("color 03");
 	cout<<"******************************"<<endl;
 	cout<<"*         惩罚小程序         *"<<endl;
 	cout<<"*     让迟到的同学爽翻天     *"<<endl;
@@ -109,7 +109,8 @@ int main(){
 				for(int i=0;i<cf;i++){
 					cout<<"请输入惩罚"<<i+1<<":"; 
 		            Punish p;
-		            cin>>p.content;
+		            cin.ignore(); // 清除输入缓冲区
+                    getline(cin, p.content);
 		            p.index = vecPunishList.size() + 1; // 设置新惩罚的索引
 		            vecPunishList.push_back(p);
 				}
@@ -138,7 +139,8 @@ int main(){
 		        for(int i=0;i<cf3;i++){
 		        	cout<<"请输入惩罚"<<i+1<<":"; 
 		            Punish p;
-		            cin>>p.content;
+		            cin.ignore(); // 清除输入缓冲区
+                    getline(cin, p.content);
 		            p.index = vecPunishList2.size() + 1; // 设置新惩罚的索引
 		            vecPunishList2.push_back(p);
 		        }
@@ -155,10 +157,12 @@ int main(){
 			int cf4;
 			cin>>cf4;
 			if(cf4>0){
-				vector<Punish> vecPunishList3(cf4);
-				cout<<"请输入你的惩罚:";
+				cout<<"请输入你的惩罚:\n";
+				vector<Punish> vecPunishList3(cf4); 
+				cin.ignore(); // 清除输入缓冲区
 				for(int i=0;i<cf4;i++){
-					cin>>vecPunishList3[i].content;
+					cout<<"请输入惩罚"<<i+1<<":"; 
+					getline(cin, vecPunishList3[i].content);
 					vecPunishList3[i].index=i+1;
 				}
 				Punished(vecPunishList3.size(),vecPunishList3);
