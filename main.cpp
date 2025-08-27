@@ -78,6 +78,21 @@ void AnimatePunishmentReveal(const string& name, const string& punishment){
     system("pause");
 }
 
+void DisplayPunishmentSummary(const vector<pair<string,string>>& punishments){
+    system("cls");
+    cout<<"===================================="<<endl;
+    cout<<"          惩罚总结列表"<<endl;
+    cout<<"===================================="<<endl;
+    
+    for (size_t i=0;i<punishments.size();++i){
+        cout<<i+1<<". "<<punishments[i].first <<" - "<<punishments[i].second<<endl;
+        cout<<"------------------------------------"<<endl;
+    }
+    
+    cout<<"\n\n";
+    system("pause");
+}
+
 void outputList(vector<Punish>& punish){	//输出惩罚列表 
 	for(auto it=punish.begin();it<punish.end();it++){
 		cout<<'\t'<<it->index<<'.'; 
@@ -111,6 +126,9 @@ void Punished(int num,vector<Punish>& punish){
 		cout<<"你输入的人数错误！"<<endl; 
 		return;
 	}
+	
+	// 存储所有惩罚结果的向量
+    vector<pair<string, string>> allPunishments;
 	system("color 07");
 	mt19937 engine;
 	uniform_int_distribution<int> dist(1, num);
@@ -121,21 +139,29 @@ void Punished(int num,vector<Punish>& punish){
             dice_roll=dist(engine);
         }while(array[dice_roll]);
         array[dice_roll]=1;
+        // 记录惩罚结果
+        allPunishments.push_back({name[i],punish[dice_roll-1].content});
         // 使用新的动画效果显示惩罚
         AnimatePunishmentReveal(name[i],punish[dice_roll-1].content);
     }
     if(people>num) {
         for(int i=num;i<people;++i){
             dice_roll=dist(engine);
+            // 记录惩罚结果
+            allPunishments.push_back({name[i], punish[dice_roll - 1].content});
+
             // 使用新的动画效果显示惩罚
         	AnimatePunishmentReveal(name[i], punish[dice_roll-1].content);
         }
     }
+    
+    // 显示惩罚总结列表
+    DisplayPunishmentSummary(allPunishments);
 } 
 
 int main(){
 	jindutiao.Jindutiao(70,200,0,0,' ',' ',"加载","low"); 
-	system("title Punish-Project 1.5");
+	system("title Punish-Project 1.6");
 	system("color 03");
 	cout<<"******************************"<<endl;
 	cout<<"*         惩罚小程序         *"<<endl;
