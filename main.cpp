@@ -7,16 +7,77 @@ struct Punish{	//惩罚结构体
 }; 
 vector<Punish> vecPunishList={	//惩罚列表 
 	{"黑板清洁工：擦一节课的黑板",1},
-	{"失败发布会：用1分钟时间，面向全班，煞有介事地推介一款根本不存在（或极其愚蠢）的“数字产品”",2},
+	{"失败发布会：用1分钟时间，面向全班，煞有介事地推介一款根本不存在（或极其愚蠢）的“数字产品”\n\t  例如：“隆重推出我的革命性产品：一款为宠物猫设计的键盘，只有‘饿’和‘撸我’两个键！”",2},
 	{"代码朗读机：用最饱满的感情、最戏剧化的语调将老师的提供一段枯燥无比、满是嵌套循环和复杂条件的代码大声朗读出来",3},
 	{"我是小模特：用大头照作为课间时大屏幕上的背景",4},
-	{"B u g 之舞：到教室前方，用身体动作模拟一个经典的软件B u g ",5},
+	{"B u g 之舞：到教室前方，用身体动作模拟一个经典的软件B u g \n\t  例如：表演“无限循环”（原地转圈不止）、“内存溢出”（身体僵硬膨胀然后倒地）、“404错误”（疯狂做找不到东西的动作）。",5},
 	{"我是小演员：模仿一个鬼畜视频10秒",6},
 	{"我是歌唱家：唱一首歌曲，要大声响亮，不少于30秒",7},
-	{"旁白解说员：为一段非常无聊的代码运行过程配旁白解说，必须使用体育赛事解说员般的激情",8},
+	{"旁白解说员：为一段非常无聊的代码运行过程配旁白解说，必须使用体育赛事解说员般的激情：\n\t  “观众朋友们！看！又一个变量被声明了！它进去了！进入了循环体！噢！这是一个漂亮的if判断！它成功了！”",8},
 	{"反向推销者：当一个“反向推销者”，用1分钟时间，极力说服大家放弃使用本节课要学的编程语言或工具，并言之凿凿地罗列它的“缺点”（即使是这些缺点是编的）",9},
 	{"小小说书人：用一分钟时间向大家分享一个关于守时重要性的小故事或名言警句",10}
 };
+
+void FlashScreen(int times=3, int delay=200){
+    HANDLE hConsole=GetStdHandle(STD_OUTPUT_HANDLE);
+    CONSOLE_SCREEN_BUFFER_INFO csbi;
+    GetConsoleScreenBufferInfo(hConsole, &csbi);
+    WORD originalAttributes=csbi.wAttributes;
+    
+    for(int i=0;i<times;i++){
+        // 闪烁效果
+        SetConsoleTextAttribute(hConsole,BACKGROUND_RED|BACKGROUND_INTENSITY);
+        Sleep(delay);
+        SetConsoleTextAttribute(hConsole,originalAttributes);
+        Sleep(delay);
+    }
+}
+
+void TypewriterEffect(const string& text, int speed=50){
+    for (char c:text){
+        cout<<c;
+        Sleep(speed);
+    }
+}
+
+void AnimatePunishmentReveal(const string& name, const string& punishment){
+    system("cls");
+    
+    // 显示谁将被惩罚
+    cout << "\n\n\t\t";
+    TypewriterEffect("接下来接受惩罚的是：",70);
+    
+    // 名字显示特效
+    SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE),FOREGROUND_RED|FOREGROUND_INTENSITY);
+    cout << "\n\n\t\t\t";
+    for (char c:name){
+        cout<<c;
+        Sleep(100);
+    }
+    
+    SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE),FOREGROUND_RED|FOREGROUND_GREEN | FOREGROUND_BLUE);
+    cout<<"\n\n\t\t";
+    TypewriterEffect("TA的惩罚是...",100);
+    
+    // suspense
+    for (int i=0;i<3;i++){
+        cout<<".";
+        Sleep(500);
+    }
+    
+    // 屏幕闪烁效果
+    FlashScreen(3,150);
+    
+    // 显示惩罚内容
+    cout<<"\n\n\t\t";
+    SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE),FOREGROUND_GREEN|FOREGROUND_INTENSITY);
+    TypewriterEffect(punishment,30);
+    
+    SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE),FOREGROUND_RED|FOREGROUND_GREEN | FOREGROUND_BLUE);
+    cout<<"\n\n\n";
+    system("pause");
+}
+
 void outputList(vector<Punish>& punish){	//输出惩罚列表 
 	for(auto it=punish.begin();it<punish.end();it++){
 		cout<<'\t'<<it->index<<'.'; 
@@ -28,7 +89,7 @@ void outputList(vector<Punish>& punish){	//输出惩罚列表
 void sout_slower(string s,int speed,int addedWait){
 	for(int i=0;i<s.length();i++){
 		cout<<s[i];
-		Sleep(speed+addedWait*i);
+		lt.HpSleep(speed+addedWait*i);
 	}
 }
 
@@ -50,6 +111,7 @@ void Punished(int num,vector<Punish>& punish){
 		cout<<"你输入的人数错误！"<<endl; 
 		return;
 	}
+	system("color 07");
 	mt19937 engine;
 	uniform_int_distribution<int> dist(1, num);
 	random_device rd;
@@ -59,25 +121,21 @@ void Punished(int num,vector<Punish>& punish){
             dice_roll=dist(engine);
         }while(array[dice_roll]);
         array[dice_roll]=1;
-        sout_slower(name[i],50,5);
-        sout_slower("的惩罚是：",50,60);
-        lt.Sout(punish[dice_roll-1].content,5);
-        cout<<endl;
+        // 使用新的动画效果显示惩罚
+        AnimatePunishmentReveal(name[i],punish[dice_roll-1].content);
     }
     if(people>num) {
-        for(int i=num;i<people;++i) {
+        for(int i=num;i<people;++i){
             dice_roll=dist(engine);
-            sout_slower(name[i],50,5);
-        	sout_slower("的惩罚是：",50,60);
-        	lt.Sout(punish[dice_roll-1].content,5);
-        	cout<<endl;
+            // 使用新的动画效果显示惩罚
+        	AnimatePunishmentReveal(name[i], punish[dice_roll-1].content);
         }
     }
 } 
 
 int main(){
 	jindutiao.Jindutiao(70,200,0,0,' ',' ',"加载","low"); 
-	system("title Punish-Project 1.4.3");
+	system("title Punish-Project 1.5");
 	system("color 03");
 	cout<<"******************************"<<endl;
 	cout<<"*         惩罚小程序         *"<<endl;
