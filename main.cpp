@@ -1,10 +1,28 @@
 #include"jindutiao.h"
+#include <mmsystem.h> // 用于播放音效
+#pragma comment(lib, "winmm.lib") // 链接Windows多媒体库
 const int WAIT=5;
 
 struct Punish{	//惩罚结构体 
 	string content;	//惩罚内容 
 	int index;	//惩罚编号 
 }; 
+
+// 音效播放函数
+void PlaySoundEffect(const string& soundType){
+    if(soundType=="drumroll"){
+        PlaySound(TEXT("SystemExclamation"),NULL,SND_ALIAS|SND_ASYNC); // 鼓声音效，用于制造悬念
+    }else if(soundType=="reveal"){
+        PlaySound(TEXT("SystemAsterisk"),NULL,SND_ALIAS|SND_ASYNC); // 揭示音效，惩罚内容展示时使用
+    }else if (soundType=="celebration"){
+        PlaySound(TEXT("SystemQuestion"),NULL,SND_ALIAS|SND_ASYNC); // 庆祝音效，惩罚结束时使用
+    }else if (soundType=="error"){
+        MessageBeep(MB_ICONERROR); // 错误音效
+    }else if (soundType=="success"){
+        MessageBeep(MB_ICONASTERISK); // 成功音效
+    }
+}
+
 vector<Punish> vecPunishList={	//惩罚列表 
 	{"黑板清洁工：擦一节课的黑板",1},
 	{"失败发布会：用1分钟时间，面向全班，煞有介事地推介一款根本不存在（或极其愚蠢）的“数字产品”\n\t  例如：“隆重推出我的革命性产品：一款为宠物猫设计的键盘，只有‘饿’和‘撸我’两个键！”",2},
@@ -33,15 +51,21 @@ void FlashScreen(int times=3, int delay=200){
     }
 }
 
-void TypewriterEffect(const string& text, int speed=50){
+void TypewriterEffect(const string& text,int speed=50,bool withSound=true){
     for (char c:text){
         cout<<c;
+        if(withSound){
+            Beep(500,30); // 打字机音效
+        }
         Sleep(speed);
     }
 }
 
 void AnimatePunishmentReveal(const string& name, const string& punishment){
     system("cls");
+    
+    // 播放鼓声音效
+    PlaySoundEffect("drumroll");
     
     // 显示谁将被惩罚
     cout << "\n\n\t\t";
@@ -68,10 +92,16 @@ void AnimatePunishmentReveal(const string& name, const string& punishment){
     // 屏幕闪烁效果
     FlashScreen(3,150);
     
+    // 播放揭示音效
+    PlaySoundEffect("reveal");
+    
     // 显示惩罚内容
     cout<<"\n\n\t\t";
     SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE),FOREGROUND_GREEN|FOREGROUND_INTENSITY);
-    TypewriterEffect(punishment,30);
+    TypewriterEffect(punishment,30, true);
+    
+    // 播放庆祝音效
+    PlaySoundEffect("celebration");
     
     SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE),FOREGROUND_RED|FOREGROUND_GREEN | FOREGROUND_BLUE);
     cout<<"\n\n\n";
@@ -80,12 +110,18 @@ void AnimatePunishmentReveal(const string& name, const string& punishment){
 
 void DisplayPunishmentSummary(const vector<pair<string,string>>& punishments){
     system("cls");
+    
+    // 播放成功音效
+    PlaySoundEffect("success");
+    
     cout<<"===================================="<<endl;
     cout<<"          惩罚总结列表"<<endl;
     cout<<"===================================="<<endl;
     
     for (size_t i=0;i<punishments.size();++i){
         cout<<i+1<<". "<<punishments[i].first <<" - "<<punishments[i].second<<endl;
+        // 每个条目显示时的轻微提示音
+        Beep(800,20);
         cout<<"------------------------------------"<<endl;
     }
     
@@ -114,18 +150,30 @@ void Punished(int num,vector<Punish>& punish){
 	system("color 74");
 	cout<<"有多少人要受惩罚：";
 	cin>>people;
-	vector<string> name(people);
-	if(people>0){
-		int i=1;
-		for(auto &n:name){
-			cout<<"请输入第"<<i<<"个人的人名：";
-			cin>>n;
-			i++;
-		}
-	}else{
-		cout<<"你输入的人数错误！"<<endl; 
-		return;
-	}
+	// 输入错误处理
+    if(cin.fail()||people<=0){
+        cin.clear();
+        cin.ignore(INT_MAX,'\n');
+        PlaySoundEffect("error"); // 播放错误音效
+        cout<<"输入错误！请重新运行程序。"<<endl;
+        Sleep(2000);
+        return;
+    }
+    
+    vector<string> name(people);
+    if(people>0){
+        int i=1;
+        for(auto& n:name){
+            cout<<"请输入第"<<i<<"个人的人名：";
+            cin>>n;
+            i++;
+        }
+    }else{
+        PlaySoundEffect("error"); // 播放错误音效
+        cout<<"你输入的人数错误！"<<endl;
+        Sleep(2000);
+        return;
+    }
 	
 	// 存储所有惩罚结果的向量
     vector<pair<string, string>> allPunishments;
@@ -160,15 +208,28 @@ void Punished(int num,vector<Punish>& punish){
 } 
 
 int main(){
+	// 程序开始音效
+    Beep(600, 200);
+    Beep(800, 200);
+	
 	jindutiao.Jindutiao(70,200,0,0,' ',' ',"加载","low"); 
-	system("title Punish-Project 1.6");
+	
+	system("title Punish-Project 1.7");
 	system("color 03");
 	cout<<"******************************"<<endl;
 	cout<<"*         惩罚小程序         *"<<endl;
 	cout<<"*     让迟到的同学爽翻天     *"<<endl;
 	cout<<"******************************"<<endl;
 	cout<<"\t\tMade by LovelyYoung"<<endl; 
+	
+	// 提示音
+    Beep(1000, 100);
+	
 	lt.DIYpause("请按下任意键，开启爽翻之旅……");
+	
+	 // 页面切换音效
+    Beep(500, 50);
+	
 	system("cls"); 
 	system("color 07");
 	cout<<"请选择（输入对应的数字）："<<endl;
@@ -179,6 +240,10 @@ int main(){
 	cout<<"4.自己输入惩罚"<<endl;
 	int in;
 	cin>>in;
+	
+	// 选择音效
+    Beep(800, 100);
+	
 	switch(in){
 		case 1:{
 			Punished(vecPunishList.size(),vecPunishList);
@@ -198,6 +263,10 @@ int main(){
 		            p.index = vecPunishList.size() + 1; // 设置新惩罚的索引
 		            vecPunishList.push_back(p);
 				}
+				// 添加成功音效
+                PlaySoundEffect("success");
+			}else{
+				PlaySoundEffect("error");
 			}
 			Punished(vecPunishList.size(),vecPunishList);
 			break;
@@ -228,11 +297,14 @@ int main(){
 		            p.index = vecPunishList2.size() + 1; // 设置新惩罚的索引
 		            vecPunishList2.push_back(p);
 		        }
+		        PlaySoundEffect("success");
 			}
 			if(cf1>0&&cf3>0){
 				Punished(vecPunishList2.size(),vecPunishList2);
 			}else{
+				PlaySoundEffect("error");
 				cout<<"没有选择任何惩罚！"<<endl;
+				Sleep(2000);
 			} 
 			break;
 		}	
@@ -248,18 +320,33 @@ int main(){
 					cout<<"请输入惩罚"<<i+1<<":"; 
 					getline(cin, vecPunishList3[i].content);
 					vecPunishList3[i].index=i+1;
+					if(i>10){
+						Beep(600 + 10 * 50, 50); // 输入进度音效
+					}else{
+						Beep(600 + i * 50, 50); // 输入进度音效
+					}
 				}
+				PlaySoundEffect("success");
 				Punished(vecPunishList3.size(),vecPunishList3);
 			}else{
+				PlaySoundEffect("error");
 				cout<<"你没有输入惩罚。"<<endl;
+				Sleep(2000);
 			}
 			break;
 		}
 		default:{
+			PlaySoundEffect("error");
 			cout<<"你是熊孩子吗？在这乱点乱按！"<<endl;
+			Sleep(2000);
 			break;
 		}
 	} 
+	
+	// 程序结束音效
+    Beep(800,200);
+    Beep(600,200);
+	
 	lt.DIYpause("请按下任意键，结束这个可恶的程序……");
 	return 0;
 }
