@@ -42,7 +42,7 @@ vector<Punish> vecPunishList={	//惩罚列表
 	{"IT支持热线：一位同学扮演一个对电脑一窍不通的暴躁用户，打电话给“IT支持”（迟到者）。\n\t   迟到者必须用最耐心、最专业的口吻，指导同学完成一个极其荒谬的任务，\n\t   例如：“如何用代码给咖啡降温？”或“我的鼠标指针不见了，如何用命令行找回来？”",16},
 	{"表情包生成：其他同学说出一个著名的网络表情包名字（如“捂脸”、“笑哭”、“狗头”），\n\t   迟到者必须在3秒内用自己的脸和身体模仿出该表情包的经典动作和神态，并由其他同学拍照“存档”。",17},
 	{"重启小剧场：迟到者需要表演一套完整的“电脑重启”流程：\n\t   先是卡顿（动作迟缓），然后蓝屏（参见惩罚:蓝屏模仿者），接着是关机（完全倒地静止5秒），\n\t   最后是开机音乐响起（自己哼唱“登~登登-登登”），活力满满地“重新启动成功”。",18},
-	{"变量名哲学：迟到者从TA之前写过的代码中随机挑一个变量名（比如 a, temp, qqq），让他面向全班，\n\t   用1分钟时间解释这个变量名的深层哲学含义、起名时的心路历程以及它对于整个宇宙的意义。",19},
+	{"变量名哲学：迟到者从TA之前写过的代码中随机挑一个变量名（比如 a, temp, qqq），让TA面向全班，\n\t   用1分钟时间解释这个变量名的深层哲学含义、起名时的心路历程以及它对于整个宇宙的意义。",19},
 	{"首席道歉官:迟到者需模仿大型科技公司CEO开发布会道歉的架势，走到台前，双手撑住讲台，面色沉重地说：\n\t   “今天，我们团队（指自己）在准时交付（指上课）上出现了不可接受的延迟，这不符合我们追求极致的价值观。\n\t   我们已成立专项工作组（指自己的大脑），深刻复盘，杜绝此类事件再次发生...”",20}
 };
 
@@ -65,13 +65,14 @@ void TypewriterEffect(const string& text,int speed=50,bool withSound=true){
     for (char c:text){
         cout<<c;
         if(withSound){
-            Beep(500,30); // 打字机音效
+            Beep(500,speed); // 打字机音效
         }
-        Sleep(speed);
+        lt.HpSleep(speed);
     }
 }
 
-void AnimatePunishmentReveal(const string& name, const string& punishment){
+// 显示三个惩罚选项并让用户选择
+int DisplayPunishmentOptions(const vector<Punish>& options, const string& name){
     system("cls");
     
     // 播放鼓声音效
@@ -91,10 +92,10 @@ void AnimatePunishmentReveal(const string& name, const string& punishment){
     
     SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE),FOREGROUND_RED|FOREGROUND_GREEN | FOREGROUND_BLUE);
     cout<<"\n\n\t\t";
-    TypewriterEffect("TA的惩罚是...",100);
+    TypewriterEffect("请从以下三个惩罚中选择一个：",100);
     
     // suspense
-    for (int i=0;i<3;i++){
+    for(int i=0;i<3;i++){
         cout<<".";
         Sleep(500);
     }
@@ -105,17 +106,36 @@ void AnimatePunishmentReveal(const string& name, const string& punishment){
     // 播放揭示音效
     PlaySoundEffect("reveal");
     
-    // 显示惩罚内容
-    cout<<"\n\n\t\t";
-    SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE),FOREGROUND_GREEN|FOREGROUND_INTENSITY);
-    TypewriterEffect(punishment,30, true);
+    // 显示三个惩罚选项
+    cout<<"\n\n";
+    for(int i=0; i<3; i++){
+        cout << i+1 << ". ";
+        SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE),FOREGROUND_GREEN|FOREGROUND_INTENSITY);
+        TypewriterEffect(options[i].content,5,true);
+        SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE),FOREGROUND_RED|FOREGROUND_GREEN|FOREGROUND_BLUE);
+        cout<<"\n\n";
+    }
     
     // 播放庆祝音效
     PlaySoundEffect("celebration");
     
-    SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE),FOREGROUND_RED|FOREGROUND_GREEN|FOREGROUND_BLUE);
-    cout<<"\n\n\n";
+    // 获取用户选择
+    int choice=0;
+    while(choice<1||choice>3){
+        cout<<"请选择(1-3): ";
+        cin>>choice;
+        if(cin.fail()||choice < 1||choice>3){
+            cin.clear();
+            cin.ignore(INT_MAX,'\n');
+            cout<<"无效选择，请重新输入!\n";
+            choice=0;
+        }
+    }
+    TypewriterEffect("你选择的惩罚是：",5,true);
+    TypewriterEffect(options[choice-1].content,5,false);
     system("pause");
+    
+    return choice-1; // 返回0-2的索引
 }
 
 void DisplayPunishmentSummary(const vector<pair<string,string>>& punishments){
@@ -156,7 +176,7 @@ void sout_slower(string s,int speed,int addedWait){
 }
 
 void Punished(int num,vector<Punish>& punish){
-	int people,array[num+1]={0},dice_roll;
+	int people;
 	system("cls"); 
 	system("color 74");
 	cout<<"有多少人要受惩罚：";
@@ -187,32 +207,60 @@ void Punished(int num,vector<Punish>& punish){
     }
 	
 	// 存储所有惩罚结果的向量
-    vector<pair<string, string>> allPunishments;
+    vector<pair<string,string>> allPunishments;
 	system("color 07");
+	
+	// 创建一个惩罚索引的向量，用于随机选择
+	vector<int> availablePunishments;
+	for(int i=0; i<num; i++){
+		availablePunishments.push_back(i);
+	}
+	
+	// 随机数生成器
 	mt19937 engine;
-	uniform_int_distribution<int> dist(1, num);
 	random_device rd;
 	engine.seed(rd());
-	for(int i=0;i<min(people,num);++i){
-        do{
-            dice_roll=dist(engine);
-        }while(array[dice_roll]);
-        array[dice_roll]=1;
-        // 记录惩罚结果
-        allPunishments.push_back({name[i],punish[dice_roll-1].content});
-        // 使用新的动画效果显示惩罚
-        AnimatePunishmentReveal(name[i],punish[dice_roll-1].content);
-    }
-    if(people>num) {
-        for(int i=num;i<people;++i){
-            dice_roll=dist(engine);
-            // 记录惩罚结果
-            allPunishments.push_back({name[i], punish[dice_roll - 1].content});
-
-            // 使用新的动画效果显示惩罚
-        	AnimatePunishmentReveal(name[i], punish[dice_roll-1].content);
-        }
-    }
+	
+	for(int i=0; i<people; i++){
+		// 如果可用的惩罚少于3个，重新填充
+		if(availablePunishments.size() < 3){
+			availablePunishments.clear();
+			for(int j=0; j<num; j++){
+				availablePunishments.push_back(j);
+			}
+		}
+		
+		// 随机选择3个不重复的惩罚
+		vector<Punish> options;
+		vector<int> selectedIndices;
+		
+		for(int j=0;j<3;j++){
+			uniform_int_distribution<int> dist(0,availablePunishments.size()-1);
+			int randomIndex=dist(engine);
+			int punishmentIndex=availablePunishments[randomIndex];
+			
+			options.push_back(punish[punishmentIndex]);
+			selectedIndices.push_back(punishmentIndex);
+			
+			// 从可用惩罚中移除已选择的
+			availablePunishments.erase(availablePunishments.begin()+randomIndex);
+		}
+		
+		// 显示选项并获取用户选择
+		int choice=DisplayPunishmentOptions(options, name[i]);
+		
+		// 记录惩罚结果
+		allPunishments.push_back({name[i],options[choice].content});
+		
+		// 从可用惩罚中移除最终选择的惩罚
+		int chosenIndex=selectedIndices[choice];
+		for(auto it=availablePunishments.begin(); it != availablePunishments.end(); it++){
+			if(*it==chosenIndex){
+				availablePunishments.erase(it);
+				break;
+			}
+		}
+	}
     
     // 显示惩罚总结列表
     DisplayPunishmentSummary(allPunishments);
